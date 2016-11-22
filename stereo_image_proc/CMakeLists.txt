@@ -13,19 +13,41 @@ catkin_package(
   LIBRARIES ${PROJECT_NAME}
 )
 
-include_directories(include)
+if(EXISTS /usr/local/opencv3)
+  list(APPEND CMAKE_PREFIX_PATH /usr/local/opencv3)
+  find_package(OpenCV 3 REQUIRED)
+  message(STATUS "OpenCV3 found at ${OpenCV_DIR}")
+  set(GPU_ENABLED true)
+else()
+  find_package(OpenCV REQUIRED)
+endif()
 
-find_package(OpenCV REQUIRED)
-include_directories(SYSTEM ${catkin_INCLUDE_DIRS}
-                           ${OpenCV_INCLUDE_DIRS}
+include_directories(
+  include
+  ${catkin_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
 
 # Nodelet library
-add_library(${PROJECT_NAME} src/libstereo_image_proc/processor.cpp src/nodelets/disparity.cpp src/nodelets/point_cloud2.cpp)
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES}
-                                      ${OpenCV_LIBRARIES}
+if(${GPU_ENABLED})
+  add_library(${PROJECT_NAME}
+    src/libstereo_image_proc/processor_gpu.cpp
+    src/nodelets/disparity.cpp
+    src/nodelets/point_cloud2.cpp
+    src/nodelets/disparity_gpu.cpp
+    src/nodelets/point_cloud2_gpu.cpp)
+else()
+  add_library(${PROJECT_NAME}
+    src/libstereo_image_proc/processor.cpp
+    src/nodelets/disparity.cpp
+    src/nodelets/point_cloud2.cpp)
+endif()
+target_link_libraries(${PROJECT_NAME}
+  ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
+
 install(TARGETS ${PROJECT_NAME}
         DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
@@ -36,7 +58,7 @@ install(FILES nodelet_plugins.xml
 # Standalone node
 add_executable(stereoimageproc_exe src/nodes/stereo_image_proc.cpp)
 target_link_libraries(stereoimageproc_exe stereo_image_proc)
-SET_TARGET_PROPERTIES(stereoimageproc_exe PROPERTIES OUTPUT_NAME stereo_image_proc)
+set_target_properties(stereoimageproc_exe PROPERTIES OUTPUT_NAME stereo_image_proc)
 install(TARGETS stereoimageproc_exe
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

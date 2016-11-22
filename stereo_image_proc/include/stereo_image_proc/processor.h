@@ -164,7 +164,7 @@ public:
                       const image_geometry::StereoCameraModel& model,
                       sensor_msgs::PointCloud2& points) const;
 
-private:
+protected:
   image_proc::Processor mono_processor_;
   
   mutable cv::Mat_<int16_t> disparity16_; // scratch buffer for 16-bit signed disparity image

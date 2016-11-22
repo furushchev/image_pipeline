@@ -8,4 +8,12 @@
     <description>Nodelet to produce XYZRGB PointCloud2 messages</description>
   </class>
 
+  <class name="stereo_image_proc/disparity_gpu" type="stereo_image_proc::GPUDisparityNodelet" base_class_type="nodelet::Nodelet">
+    <description>Nodelet to perform stereo processing on a pair of rectified image streams, producing disparity images</description>
+  </class>
+
+  <class name="stereo_image_proc/point_cloud2_gpu" type="stereo_image_proc::GPUPointCloud2Nodelet" base_class_type="nodelet::Nodelet">
+    <description>Nodelet to produce XYZRGB PointCloud2 messages</description>
+  </class>
+
 </library>
