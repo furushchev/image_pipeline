@@ -33,6 +33,7 @@
 *********************************************************************/
 #include <cv_bridge/cv_bridge.h>
 #include <dynamic_reconfigure/server.h>
+#include <image_transport/image_transport.h>
 #include <nodelet/nodelet.h>
 #include <nodelet_topic_tools/nodelet_lazy.h>
 #include <ros/ros.h>
@@ -48,7 +49,7 @@ class ResizeNodelet : public nodelet_topic_tools::NodeletLazy
 {
 protected:
   // ROS communication
-  ros::Publisher pub_image_;
+  image_transport::Publisher pub_image_;
   ros::Publisher pub_info_;
   ros::Subscriber sub_info_;
   ros::Subscriber sub_image_;
@@ -80,7 +81,7 @@ void ResizeNodelet::onInit()
   reconfigure_server_->setCallback(f);
 
   pub_info_ = advertise<sensor_msgs::CameraInfo>(*pnh_, "camera_info", 1);
-  pub_image_ = advertise<sensor_msgs::Image>(*pnh_, "image", 1);
+  pub_image_ = image_transport::ImageTransport(*pnh_).advertise("image", 1);
 
   onInitPostProcess();
 }
